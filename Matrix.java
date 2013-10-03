@@ -190,7 +190,7 @@ public class Matrix{
 		double wi[]=new double[row+1];
 		
 		for(int i=1;i<row+1;++i){
-			for(int j=0;j<col+1;++j)
+			for(int j=1;j<col+1;++j)
 				a[i][j]=m.getElem(i-1,j-1);
 		}
 		
@@ -1206,19 +1206,10 @@ public class Matrix{
 		}
 
 		public Matrix getD() {
-			Matrix X = new Matrix(n, n);
+			Matrix X = new Matrix(n, 1);
 			double[][] D = X.getArray();
 			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					D[i][j] = 0.0;
-				}
-				D[i][i] = d[i];
-				if (e[i] > 0) {
-					D[i][i + 1] = e[i];
-				} else if (e[i] < 0) {
-					D[i][i - 1] = e[i];
-				}
-			}
+				D[i][0] = d[i];
 			return X;
 		}
 		public Matrix getV() {
