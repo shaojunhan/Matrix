@@ -1,5 +1,3 @@
-import java.lang.AssertionError;
-
 public class Matrix{
 	public Matrix(int row,int col){
 		assert (row>0 && col>0):"row or column of matrix if illegal";
@@ -85,10 +83,10 @@ public class Matrix{
 		}		
 	}
 	//used by inverse
-	private void swap(Matrix m,int i,int j,int m,int k){
+	private void swap(Matrix m,int i,int j,int l,int k){
 		double temp=m.getElem(i,j);
-		m.setElem(i,j,m.getElem(m,k));
-		m.setElem(m,k,temp);
+		m.setElem(i,j,m.getElem(l,k));
+		m.setElem(l,k,temp);
 	}
 	//used by inverse
 	private void inverse_course(Matrix m,int k){
@@ -178,8 +176,8 @@ public class Matrix{
 	
 	public static void eig(Matrix m,Matrix eigValue,Matrix eigVec) {
 		Eig e=new Eig(m);
-		m.getD().copyInto(eigValue);
-		m.getV.copyInto(eigVec);
+		e.getD().copyInto(eigValue);
+		e.getV().copyInto(eigVec);
 	}
 
 	public static void eig(Matrix m,Matrix eigValue){
@@ -206,11 +204,11 @@ public class Matrix{
 	public static void solve(Matrix mat,Matrix key){
 		assert (mat.getRow()==key.getRow()):"argumented matrix is wrong";
 		double[][] m=mat.getArray();
-		double[] x=key.getArray();
+		double[][] x=key.getArray();
 		int row=mat.getRow(),col=mat.getCol();
 
 		for(int i=0;i<row;++i)
-			x[i]=0;
+			x[i][0]=0;
 		//
 		for(int i=0;i<row-1;++i){
 			//
@@ -219,32 +217,36 @@ public class Matrix{
 			for(int j=i+1;j<row;++j){
 				if(Math.abs(m[j][i])>fMax)
 				{
-					fMax=Math.abs(matrix[j][i]);
+					fMax=Math.abs(m[j][i]);
 					k=j;
 				}
 			}
 			//
 			if(k!=i){
-				for(int j=i;j<col;++j)
-					swap(m,i,j,k,j);
-				for(j=i+1;j<row;j++){
-					if(matrix[i][i]==0.0f)
+				for(int j=i;j<col;++j){
+					double[] t=swap(m[i][j],m[k][j]);
+						m[i][j]=t[0];
+						m[k][j]=t[1];
+				}
+				for(int j=i+1;j<row;j++){
+					if(m[i][i]==0.0f)
 						return;
 					double l=m[j][i]/m[i][i];
 	
-					matrix[j][i]=0.0f;
+					m[j][i]=0.0f;
 					for(k=i+1;k<col;++k)
 						m[j][k]-=l*m[i][k];
+				}
 			}
 		}
 	//
-		for(i=row-1;i>=0;--i){
+		for(int i=row-1;i>=0;--i){
 			double l=m[i][col-1];
-			for(j=i+1;j<row;j++)
-				l-=m[i][j]*x[j];
+			for(int j=i+1;j<row;j++)
+				l-=m[i][j]*x[j][0];
 			if(m[i][i]==0.0f)
 				return;
-			x[i]=l/m[i][i];
+			x[i][0]=l/m[i][i];
 		}		
 	}
 
@@ -471,30 +473,28 @@ public class Matrix{
 			} while (l < nn - 1);
 		}
 	}
-
+	private static class Maths {
+		public static double hypot(double a, double b) {
+			double r;
+			if (Math.abs(a) > Math.abs(b)) {
+				r = b / a;
+				r = Math.abs(a) * Math.sqrt(1 + r * r);
+			} else if (b != 0) {
+				r = a / b;
+				r = Math.abs(b) * Math.sqrt(1 + r * r);
+			} else {
+				r = 0.0;
+			}
+			return r;
+		}
+	}
         /** internal class for eig method**/
-	private class Eig{
+	private static class Eig{
 		private boolean issymmetric;
 		private int n;
 		private double[][] V, H;
 		private double[] d, e, ort;
 		private transient double cdivr, cdivi;
-		
-		private static class Maths {
-			public static double hypot(double a, double b) {
-				double r;
-				if (Math.abs(a) > Math.abs(b)) {
-					r = b / a;
-					r = Math.abs(a) * Math.sqrt(1 + r * r);
-				} else if (b != 0) {
-					r = a / b;
-					r = Math.abs(b) * Math.sqrt(1 + r * r);
-				} else {
-					r = 0.0;
-				}
-				return r;
-			}
-		}
 
 		private void tred2() {
 			for (int j = 0; j < n; j++) {
@@ -1162,8 +1162,9 @@ public class Matrix{
 		}
 
 		public Eig(Matrix Arg) {
+			assert (Arg.getRow() == Arg.getCol()) : "the format of the matrix is wrong!\n";			
 			double[][] A = Arg.getArray();
-			n = Arg.getColumn();
+			n = Arg.getCol();
 			V = new double[n][n];
 			d = new double[n];
 			e = new double[n];
@@ -1205,11 +1206,10 @@ public class Matrix{
 		}
 
 		public Matrix getD() {
-			assert (row == column) : "the format of the matrix is wrong!\n";
-			Matrix X = new Matrix(column, column);
+			Matrix X = new Matrix(n, n);
 			double[][] D = X.getArray();
-			for (int i = 0; i < column; i++) {
-				for (int j = 0; j < column; j++) {
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
 					D[i][j] = 0.0;
 				}
 				D[i][i] = d[i];
@@ -1222,7 +1222,7 @@ public class Matrix{
 			return X;
 		}
 		public Matrix getV() {
-			return new Matrix(V, n, n);
+			return new Matrix(V);
 		}
 	}
 
