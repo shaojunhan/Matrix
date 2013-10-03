@@ -1208,13 +1208,24 @@ public class Matrix{
 		public Matrix getD() {
 			Matrix X = new Matrix(n, 1);
 			double[][] D = X.getArray();
-			for (int i = 0; i < n; i++) {
+			for (int i = 0; i < n; i++)
 				D[i][0] = d[i];
 			return X;
 		}
 		public Matrix getV() {
 			return new Matrix(V);
 		}
+	}
+
+	public String toString(){
+		String str;
+		for(int i=0;i<getRow();++i){
+			for(int j=0;j<getCol();++j){
+				str+=getElem(i,j)+" ";	
+			}
+			str+="\n";
+		}
+		return str;
 	}
 
 	private double elem[][];

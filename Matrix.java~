@@ -1208,7 +1208,7 @@ public class Matrix{
 		public Matrix getD() {
 			Matrix X = new Matrix(n, 1);
 			double[][] D = X.getArray();
-			for (int i = 0; i < n; i++) {
+			for (int i = 0; i < n; i++)
 				D[i][0] = d[i];
 			return X;
 		}
