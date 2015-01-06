@@ -1,5 +1,6 @@
 public class Matrix{
 	public Matrix(int row,int col){
+		//it's a better habit to use the assert.
 		assert (row>0 && col>0):"row or column of matrix if illegal";
 		this.row=row;this.col=col;
 		elem=new double[row][col];
